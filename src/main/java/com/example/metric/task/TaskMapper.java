@@ -2,32 +2,26 @@ package com.example.metric.task;
 
 import com.example.metric.task.model.FieldResponse;
 import com.example.metric.task.model.TaskResponse;
+import io.r2dbc.spi.Row;
 import lombok.AllArgsConstructor;
-import org.springframework.jdbc.core.RowMapper;
-
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @AllArgsConstructor
-public class TaskMapper implements RowMapper<TaskResponse> {
+public class TaskMapper {
 
-    private List<String> fields;
+    private final List<String> fields;
 
-    @Override
-    public TaskResponse mapRow(ResultSet rs, int rowNum) throws SQLException {
-        TaskResponse taskResponse = new TaskResponse();
-        List<FieldResponse> fieldResponses = new ArrayList<>();
-        while (rs.next()) {
-            FieldResponse fieldResponse = new FieldResponse();
-            for (String field : fields) {
-                fieldResponse.setFieldName(field);
-                fieldResponse.setFieldValue(rs.getObject(field));
-            }
-            fieldResponses.add(fieldResponse);
-        }
-        taskResponse.setFields(fieldResponses);
-        return taskResponse;
+    private FieldResponse mapField(Row row, String fieldName) {
+        FieldResponse fieldResponse = new FieldResponse();
+        fieldResponse.setFieldName(fieldName);
+        fieldResponse.setFieldValue(row.get(fieldName));
+        return fieldResponse;
+    }
+
+    public TaskResponse mapRow(Row row) {
+        return new TaskResponse(fields.stream()
+                .map(fieldName -> mapField(row, fieldName))
+                .collect(Collectors.toList()));
     }
 }

@@ -2,12 +2,12 @@ package com.example.metric.task;
 
 import com.example.metric.task.model.TaskRequest;
 import com.example.metric.task.model.TaskResponse;
+import io.r2dbc.spi.Row;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 
-import java.util.List;
 
 @Component
 public class TaskRepository {
@@ -16,8 +16,7 @@ public class TaskRepository {
     private TaskQueryBuilder taskQueryBuilder;
 
     @Autowired
-    private JdbcTemplate jdbcTemplate;
-
+    private DatabaseClient databaseClient;
 
     public Flux<TaskResponse> getTasks(TaskRequest taskRequest) {
 
@@ -25,9 +24,9 @@ public class TaskRepository {
 
         TaskMapper taskMapper = new TaskMapper(taskRequest.getFields());
 
-        List<TaskResponse> responses = jdbcTemplate.query(build, taskMapper);
-
-        return Flux.fromIterable(responses);
+        return databaseClient.sql(build)
+                .map(raw -> taskMapper.mapRow((Row) raw))
+                .all();
     }
 
 }
