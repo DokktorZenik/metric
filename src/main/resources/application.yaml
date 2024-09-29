@@ -2,8 +2,12 @@ server:
   port: 8080
 
 spring:
+  data:
+    postgres:
+      port: 5432
+      host: 127.0.0.1
   r2dbc:
-    url: r2dbc:postgresql://localhost:5432/postgres
+    url: r2dbc:postgresql://${spring.data.postgres.host}:${spring.data.postgres.port}/postgres
     username: postgres
     password: DanZ
 

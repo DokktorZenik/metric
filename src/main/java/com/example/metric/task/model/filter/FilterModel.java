@@ -22,7 +22,9 @@ public class FilterModel {
 
     @Override
     public String toString() {
-        String collect = values.stream().map(elem -> field + " " + action + " " + transformToLike(elem)).collect(Collectors.joining(" or "));
+        String collect = values.stream().map(elem ->
+                convertName(field) + " " + action + " " + transformToLike(elem))
+                .collect(Collectors.joining(" or "));
         return values.size() > 1 ? this.wrap(collect) : collect;
     }
 
@@ -30,9 +32,17 @@ public class FilterModel {
         return "(" + string + ")";
     }
 
-    private String convertData(String data, DataType dataType) {
+    private String convertName(String name) {
+        if (dataType.equals(DataType.STRING)) {
+            return "LOWER(" + name + ")";
+        }
+        return name;
+    }
+
+    private String convertData(String data) {
         switch (dataType) {
             case STRING:
+                return "LOWER('" + data + "')";
             case DATA:
                 return "'" + data + "'";
             case LONG:
@@ -43,6 +53,6 @@ public class FilterModel {
     }
 
     private String transformToLike(String value) {
-        return convertData(action.equals(Action.LIKE) ? "%" + value + "%" : value, dataType);
+        return convertData(action.equals(Action.LIKE) ? "%" + value + "%" : value);
     }
 }
