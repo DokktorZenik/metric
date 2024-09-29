@@ -3,6 +3,7 @@ package com.example.metric.util;
 import com.example.metric.task.model.filter.FilterModel;
 import lombok.Builder;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Builder
@@ -34,9 +35,10 @@ public class QueryBuilder {
 
     private String where() {
         String result = "where ";
+        List<String> conditions = new ArrayList<>();
         for (FilterModel filter : where) {
-            result += filter.toString() + " and ";
+            conditions.add(filter.toString());
         }
-        return result + " ";
+        return result + String.join(" and ", conditions) + " ";
     }
 }
