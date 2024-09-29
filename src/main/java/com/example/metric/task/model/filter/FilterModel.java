@@ -13,19 +13,21 @@ import java.util.stream.Collectors;
 public class FilterModel {
 
     private String field;
-
     private Action action;
-
     private List<String> values;
-
     private DataType dataType;
 
     @Override
     public String toString() {
-        String collect = values.stream().map(elem ->
-                convertName(field) + " " + action + " " + transformToLike(elem))
+        if (values == null || values.isEmpty()) {
+            return "";
+        }
+
+        String conditions = values.stream()
+                .map(elem -> String.format("%s %s %s", convertName(field), action, transformToLike(elem)))
                 .collect(Collectors.joining(" or "));
-        return values.size() > 1 ? this.wrap(collect) : collect;
+
+        return values.size() > 1 ? wrap(conditions) : conditions;
     }
 
     private String wrap(String string) {
@@ -33,26 +35,19 @@ public class FilterModel {
     }
 
     private String convertName(String name) {
-        if (dataType.equals(DataType.STRING)) {
-            return "LOWER(" + name + ")";
-        }
-        return name;
+        return dataType == DataType.STRING ? "LOWER(" + name + ")" : name;
     }
 
     private String convertData(String data) {
-        switch (dataType) {
-            case STRING:
-                return "LOWER('" + data + "')";
-            case DATA:
-                return "'" + data + "'";
-            case LONG:
-                return data;
-            default:
-                return data;
-        }
+        return switch (dataType) {
+            case STRING -> "LOWER('" + data + "')";
+            case DATA -> "'" + data + "'";
+            case LONG -> data;
+            default -> data;
+        };
     }
 
     private String transformToLike(String value) {
-        return convertData(action.equals(Action.LIKE) ? "%" + value + "%" : value);
+        return convertData(action == Action.LIKE ? "%" + value + "%" : value);
     }
 }
