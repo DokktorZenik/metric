@@ -21,6 +21,6 @@ public class TaskRoutes {
     RouterFunction<ServerResponse> taskApi() {
         RouterFunction<ServerResponse> taskRoute = route(POST("/metric"), taskHandler::getMetric);
 
-        return nest(path("/v1/{orgName}/projects/{projectName}"), taskRoute);
+        return nest(path("/v1/organizations/{orgName}/projects/{projectName}"), taskRoute);
     }
 }
