@@ -18,7 +18,7 @@ import static com.example.metric.context.ProjectContextHolder.setContext;
 @RequiredArgsConstructor
 public class OrgProjectFilter implements WebFilter {
 
-    private static final Pattern URL_PATTERN = Pattern.compile("^/organizations/([^/]+)/projects/([^/]+)$");
+    private static final Pattern URL_PATTERN = Pattern.compile("\\/organizations\\/([^\\/]+)\\/projects\\/([^\\/]+)");
 
     private final SQLiteService sqLiteService;
 
