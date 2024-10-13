@@ -7,4 +7,4 @@ server:
     password: ${DATASOURCE_PASSWORD}
 
 sqlite:
-  url: "jdbc:sqlite:/path/to/your/db.sqlite"
+  url: ${SQLITE_URL}

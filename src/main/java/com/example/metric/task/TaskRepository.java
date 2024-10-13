@@ -25,7 +25,7 @@ public class TaskRepository {
 
         ProjectContext context = getContext();
 
-        String build = taskQueryBuilder.build(taskRequest.getFields(), taskRequest.getFilters(), context.getOrgId(), context.getProjectId());
+        String build = taskQueryBuilder.build(taskRequest.getFields(), taskRequest.getFilters(), context.orgId(), context.projectId());
 
         TaskMapper taskMapper = new TaskMapper(taskRequest.getFields());
 
