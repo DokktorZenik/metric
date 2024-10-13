@@ -1,14 +1,8 @@
 server:
   port: 8084
 
-spring:
-  data:
-    postgres:
-      port: ${DATASOURCE_PORT}
-      host: ${DATASOURCE_HOST}
-      database: ${DATASOURCE_DBNAME}
   r2dbc:
-    url: r2dbc:postgresql://${spring.data.postgres.host}:${spring.data.postgres.port}/${spring.data.postgres.database}
+    url: r2dbc:postgresql://${DATASOURCE_URL}
     username: ${DATASOURCE_USERNAME}
     password: ${DATASOURCE_PASSWORD}
 
