@@ -1,5 +1,6 @@
 package com.example.metric.task;
 
+import com.example.metric.context.ProjectContext;
 import com.example.metric.task.model.TaskRequest;
 import com.example.metric.task.model.TaskResponse;
 import io.r2dbc.spi.Row;
@@ -7,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
+
+import static com.example.metric.context.ProjectContextHolder.getContext;
 
 
 @Component
@@ -20,7 +23,9 @@ public class TaskRepository {
 
     public Flux<TaskResponse> getTasks(TaskRequest taskRequest) {
 
-        String build = taskQueryBuilder.build(taskRequest.getFields(), taskRequest.getFilters(), 1L, 1L);
+        ProjectContext context = getContext();
+
+        String build = taskQueryBuilder.build(taskRequest.getFields(), taskRequest.getFilters(), context.getOrgId(), context.getProjectId());
 
         TaskMapper taskMapper = new TaskMapper(taskRequest.getFields());
 
