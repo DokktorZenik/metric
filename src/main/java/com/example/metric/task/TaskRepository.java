@@ -3,11 +3,13 @@ package com.example.metric.task;
 import com.example.metric.context.ProjectContext;
 import com.example.metric.task.model.TaskRequest;
 import com.example.metric.task.model.TaskResponse;
-import io.r2dbc.spi.Row;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.r2dbc.core.DatabaseClient;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
+import reactor.core.scheduler.Schedulers;
+
+import java.util.List;
 
 import static com.example.metric.context.ProjectContextHolder.getContext;
 
@@ -19,19 +21,20 @@ public class TaskRepository {
     private TaskQueryBuilder taskQueryBuilder;
 
     @Autowired
-    private DatabaseClient databaseClient;
+    private JdbcTemplate jdbcTemplate;
 
     public Flux<TaskResponse> getTasks(TaskRequest taskRequest) {
-
         ProjectContext context = getContext();
 
-        String build = taskQueryBuilder.build(taskRequest.getFields(), taskRequest.getFilters(), context.orgId(), context.projectId());
+        String sql = taskQueryBuilder.build(taskRequest.getFields(), taskRequest.getFilters(), context.orgId(), context.projectId());
 
-        TaskMapper taskMapper = new TaskMapper(taskRequest.getFields());
+        return Flux.defer(() -> Flux.fromIterable(queryTasks(sql, taskRequest.getFields())))
+                .subscribeOn(Schedulers.boundedElastic());
+    }
 
-        return databaseClient.sql(build)
-                .map(raw -> taskMapper.mapRow((Row) raw))
-                .all();
+    private List<TaskResponse> queryTasks(String sql, List<String> fields) {
+        TaskMapper taskMapper = new TaskMapper(fields);
+        return jdbcTemplate.query(sql, taskMapper);
     }
 
 }
