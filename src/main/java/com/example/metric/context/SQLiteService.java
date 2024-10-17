@@ -15,11 +15,11 @@ import java.sql.SQLException;
 @Component
 public class SQLiteService {
 
-    @Value("${sqlite.url}")
-    private String DB_URL;
+    @Value("${sqlite.metadata-url}")
+    private String METADATA_DB_URL;
 
     public Mono<Tuple2<Long, Long>> getIds(String orgName, String projectName) {
-        try (Connection connection = DriverManager.getConnection(DB_URL)) {
+        try (Connection connection = DriverManager.getConnection(METADATA_DB_URL)) {
             Long orgId = getIdByField(connection, "organizations", "name", orgName);
             Long projectId = getIdByField(connection, "projects", "name", projectName);
             if (orgId == null || projectId == null) {

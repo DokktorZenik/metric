@@ -17,8 +17,8 @@ import javax.sql.DataSource;
 @Component
 public class Config implements WebFilter {
 
-    @Value("${sqlite.url}")
-    private String URL;
+    @Value("${sqlite.tasks-url}")
+    private String TASKS_DB_URL;
 
     private static final Logger logger = LoggerFactory.getLogger(Config.class);
 
@@ -32,7 +32,7 @@ public class Config implements WebFilter {
     public DataSource dataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName("org.sqlite.JDBC");
-        dataSource.setUrl(URL);
+        dataSource.setUrl(TASKS_DB_URL);
         return dataSource;
     }
 
