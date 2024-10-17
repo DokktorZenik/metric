@@ -2,5 +2,5 @@ server:
   port: 8084
 
 sqlite:
-  metadata-url: jdbc:sqlite:/home/zenik/Downloads/mictoservices/db.sqlite
-  tasks-url: jdbc:sqlite:/home/zenik/Downloads/mictoservices/db.sqlite
+  metadata-url: ${METADATA_SQLITE_URL}
+  tasks-url: ${TASKS_SQLITE_URL}
