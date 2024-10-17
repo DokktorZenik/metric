@@ -2,13 +2,16 @@ package com.example.metric.context;
 
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
 
+import java.nio.charset.StandardCharsets;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -18,7 +21,7 @@ import static com.example.metric.context.ProjectContextHolder.setContext;
 @RequiredArgsConstructor
 public class OrgProjectFilter implements WebFilter {
 
-    private static final Pattern URL_PATTERN = Pattern.compile("\\/organizations\\/([^\\/]+)\\/projects\\/([^\\/]+)");
+    private static final Pattern URL_PATTERN = Pattern.compile("\\/v1/organizations\\/([^\\/]+)\\/projects\\/([^\\/]+)/[^\\/]+");
 
     private final SQLiteService sqLiteService;
 
@@ -37,8 +40,14 @@ public class OrgProjectFilter implements WebFilter {
                         return chain.filter(exchange);
                     })
                     .onErrorResume(e -> {
-                        exchange.getResponse().setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR);
-                        return exchange.getResponse().setComplete();
+                        exchange.getResponse().setStatusCode(HttpStatus.BAD_REQUEST);
+
+                        DataBuffer buffer = exchange.getResponse()
+                                .bufferFactory()
+                                .wrap(e.getMessage().getBytes(StandardCharsets.UTF_8));
+                        exchange.getResponse().getHeaders().setContentType(MediaType.TEXT_PLAIN);
+
+                        return exchange.getResponse().writeWith(Mono.just(buffer));
                     });
         }
 

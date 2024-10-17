@@ -2,4 +2,4 @@ server:
   port: 8084
 
 sqlite:
-  url: ${SQLITE_URL}
+  url: jdbc:sqlite:/home/zenik/Downloads/mictoservices/db.sqlite

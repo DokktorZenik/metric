@@ -19,7 +19,7 @@ public class TaskMapper  implements RowMapper<TaskResponse> {
         FieldResponse fieldResponse = new FieldResponse();
         fieldResponse.setFieldName(fieldName);
         try {
-            fieldResponse.setFieldValue(resultSet.findColumn(fieldName));
+            fieldResponse.setFieldValue(resultSet.getObject(fieldName));
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

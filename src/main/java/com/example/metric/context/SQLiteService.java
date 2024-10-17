@@ -22,6 +22,9 @@ public class SQLiteService {
         try (Connection connection = DriverManager.getConnection(DB_URL)) {
             Long orgId = getIdByField(connection, "organizations", "name", orgName);
             Long projectId = getIdByField(connection, "projects", "name", projectName);
+            if (orgId == null || projectId == null) {
+                return Mono.error(() -> new IllegalStateException("Could not find organizations and projects"));
+            }
             return Mono.just(Tuples.of(orgId, projectId));
         } catch (SQLException e) {
             throw new RuntimeException("Database error", e);
