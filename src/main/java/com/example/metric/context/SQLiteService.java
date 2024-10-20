@@ -11,6 +11,10 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Component
 public class SQLiteService {
@@ -20,8 +24,8 @@ public class SQLiteService {
 
     public Mono<Tuple2<Long, Long>> getIds(String orgName, String projectName) {
         try (Connection connection = DriverManager.getConnection(METADATA_DB_URL)) {
-            Long orgId = getIdByField(connection, "organizations", "name", orgName);
-            Long projectId = getIdByField(connection, "projects", "name", projectName);
+            Long orgId = getIdByField(connection, "organizations", Map.of("name", orgName));
+            Long projectId = getIdByField(connection, "projects", Map.of("name", projectName, "org_id", orgId));
             if (orgId == null || projectId == null) {
                 return Mono.error(() -> new IllegalStateException("Could not find organizations and projects"));
             }
@@ -31,10 +35,17 @@ public class SQLiteService {
         }
     }
 
-    public Long getIdByField(Connection connection, String tableName, String fieldName, String fieldValue) throws SQLException {
-        String query = String.format("SELECT id FROM %s WHERE %s = ?", tableName, fieldName);
+    public Long getIdByField(Connection connection, String tableName, Map<String, Object> conditions) throws SQLException {
+        Set<Map.Entry<String, Object>> entries = conditions.entrySet();
+        List<String> conditionsList = new ArrayList<>();
+        for (Map.Entry<String, Object> entry : entries) {
+            String fieldName = entry.getKey();
+            Object value = entry.getValue();
+            conditionsList.add(fieldName + "=" + value);
+        }
+
+        String query = String.format("SELECT id FROM %s WHERE %s", tableName, String.join(" AND ", conditionsList));
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setString(1, fieldValue);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
                 return rs.getLong("id");
