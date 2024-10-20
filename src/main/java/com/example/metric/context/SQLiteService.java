@@ -24,8 +24,8 @@ public class SQLiteService {
 
     public Mono<Tuple2<Long, Long>> getIds(String orgName, String projectName) {
         try (Connection connection = DriverManager.getConnection(METADATA_DB_URL)) {
-            Long orgId = getIdByField(connection, "organizations", Map.of("name", orgName));
-            Long projectId = getIdByField(connection, "projects", Map.of("name", projectName, "org_id", orgId));
+            Long orgId = getIdByField(connection, "organization", Map.of("name", orgName));
+            Long projectId = getIdByField(connection, "project", Map.of("name", projectName, "org_id", orgId));
             if (orgId == null || projectId == null) {
                 return Mono.error(() -> new IllegalStateException("Could not find organizations and projects"));
             }
