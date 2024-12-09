@@ -12,13 +12,13 @@ import java.util.List;
 public class TaskQueryBuilder {
 
     public String build(List<String> fields, List<FilterModel> filters, Long orgId, Long projectId) {
-        filters.add(new FilterModel("org_id", Action.EQ, List.of(orgId.toString()), DataType.LONG));
-        filters.add(new FilterModel("project_id", Action.EQ, List.of(projectId.toString()), DataType.LONG));
+        filters.add(new FilterModel("orgid", Action.EQ, List.of(orgId.toString()), DataType.LONG));
+        filters.add(new FilterModel("projectid", Action.EQ, List.of(projectId.toString()), DataType.LONG));
         return QueryBuilder
                 .builder()
                 .select(fields)
                 .where(filters)
-                .from("project_tasks")
+                .from("task")
                 .desc(true)
                 .orderBy(fields.get(0))
                 .build()
